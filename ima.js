@@ -6,9 +6,12 @@ function convertToBlackAndWhite(rgbaArray)
 
 }
 
-function readImage(fileName)
+/**
+ * Reads an image into the RGB pixel format
+ * @param {the name of the file} fileName 
+ */
+function readImage(fileName, callback)
 {
-    //TODO: figure out how to wait for this to finish
     getPixels(fileName, function(err, pixels)
     {
         var rgbaArray = [];
@@ -26,13 +29,17 @@ function readImage(fileName)
                 rgbaArray.push({r: pixels.get(i, j, 0), g: pixels.get(i, j, 1), b: pixels.get(i, j, 2), a: pixels.get(i, j, 3)});
             }
         }
-        return rgbaArray;
+        callback(null, rgbaArray);
     });
 }
 
 function main()
 {
-    readImage("test_images/test-image.png");
+    readImage("test_images/test-image.png", function(err, data)
+    {
+        if (err) throw err;
+        console.log(data);
+    });
 }
 
 main();
