@@ -16,6 +16,29 @@ function convertToSepia(fileName, callback)
             {
                 callback(new Error("Error occurred while getting pixels", null));
             }
+
+            var sepiaArray = [];
+            var nx = pixels.shape[0];
+            var ny = pixels.shape[1];
+
+            for (var i = 0; i < nx; i++)
+            {
+                for (var j = 0; j < ny; j++)
+                {
+                    var rOrig = pixels.get(i, j, 0);
+                    var gOrig = pixels.get(i, j, 1);
+                    var bOrig = pixels.get(i, j, 2);
+                    sepiaArray.push(
+                    {
+                        r: (rOrig * .393) + (gOrig * .769) + (bOrig * .189),
+                        g: (rOrig * .349) + (gOrig * .686) + (bOrig * .168),
+                        b: (rOrig * .272) + (gOrig * .534) + (bOrig * .131),
+                        a: pixels.get(i, j, 3)
+                    });
+                }
+            }
+
+            callback(null, sepiaArray);
         });
     } else
     {
