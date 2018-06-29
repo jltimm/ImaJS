@@ -2,10 +2,24 @@ var fs = require('fs');
 var getPixels = require('get-pixels');
 
 /**
- * Converts an image to black and white, and either writes to a file or returns an array
+ * Converts an image to sepia and returns an RGBA array
  * @param {string} fileName The name of the file to be read
- * @param {array} rgbaArray The array of pixels to be read
- * @param {boolean} shouldWriteToFile Boolean representing if the file should be written
+ * @param {function} callback The callback
+ */
+function convertToSepia(fileName, callback)
+{
+    if (fileName)
+    {
+
+    } else
+    {
+        callback(new Error("Filename is null"));
+    }
+}
+
+/**
+ * Converts an image to black and white and returns an RGBA array
+ * @param {string} fileName The name of the file to be read
  * @param {function} callback The callback
  */
 function convertToBlackAndWhite(fileName, callback)
@@ -36,7 +50,7 @@ function convertToBlackAndWhite(fileName, callback)
                     });
                 }
             }
-            
+
             callback(null, bwArray);
         });
     } else
