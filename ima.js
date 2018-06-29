@@ -10,7 +10,13 @@ function convertToSepia(fileName, callback)
 {
     if (fileName)
     {
-
+        getPixels(fileName, function(err, pixels)
+        {
+            if (err)
+            {
+                callback(new Error("Error occurred while getting pixels", null));
+            }
+        });
     } else
     {
         callback(new Error("Filename is null"));
@@ -61,7 +67,7 @@ function convertToBlackAndWhite(fileName, callback)
 
 function main()
 {
-    convertToBlackAndWhite("test_images/test-image.png", function(err, data)
+    convertToSepia("test_images/test-image.png", function(err, data)
     {
         if (err) throw err;
         console.log(data);
