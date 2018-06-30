@@ -23,12 +23,13 @@ function convertToSepia(fileName, callback)
 
             for (var i = 0; i < nx; i++)
             {
+                sepiaRow = [];
                 for (var j = 0; j < ny; j++)
                 {
                     var rOrig = pixels.get(i, j, 0);
                     var gOrig = pixels.get(i, j, 1);
                     var bOrig = pixels.get(i, j, 2);
-                    sepiaArray.push(
+                    sepiaRow.push(
                     {
                         r: (rOrig * .393) + (gOrig * .769) + (bOrig * .189),
                         g: (rOrig * .349) + (gOrig * .686) + (bOrig * .168),
@@ -36,6 +37,7 @@ function convertToSepia(fileName, callback)
                         a: pixels.get(i, j, 3)
                     });
                 }
+                sepiaArray.push(sepiaRow);
             }
 
             callback(null, sepiaArray);
@@ -68,9 +70,10 @@ function convertToBlackAndWhite(fileName, callback)
 
             for (var i = 0; i < nx; i++)
             {
+                bwRow = [];
                 for (var j = 0; j < ny; j++)
                 {
-                    bwArray.push(
+                    bwRow.push(
                     {
                         r: pixels.get(i, j, 0) * 0.299,
                         g: pixels.get(i, j, 1) * 0.587,
@@ -78,6 +81,7 @@ function convertToBlackAndWhite(fileName, callback)
                         a: pixels.get(i, j, 3)
                     });
                 }
+                bwArray.push(bwRow);
             }
 
             callback(null, bwArray);
@@ -88,12 +92,24 @@ function convertToBlackAndWhite(fileName, callback)
     }
 }
 
+function convertArrayToBuffer(array)
+{
+    console.log(array[0].length);
+}
+
 function main()
 {
     convertToSepia("test_images/test-image.png", function(err, data)
     {
         if (err) throw err;
-        console.log(data);
+        convertArrayToBuffer(data);
+        //console.log(data);
+    });
+
+    fs.readFile("test_images/test-image.png", function(err, data)
+    {
+        if (err) throw err;
+        console.log(data.length);
     });
 }
 
