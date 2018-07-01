@@ -1,5 +1,6 @@
 var fs = require('fs');
-var getPixels = require('get-pixels');
+var path = require('path');
+var PNG = require('pngjs').PNG;
 
 /**
  * Converts an image to sepia and returns an RGBA array
@@ -10,7 +11,7 @@ function convertToSepia(fileName, callback)
 {
     if (fileName)
     {
-        getPixels(fileName, function(err, pixels)
+        getPixels(fileName, function(err, img, pixels)
         {
             if (err)
             {
@@ -18,23 +19,23 @@ function convertToSepia(fileName, callback)
             }
 
             var sepiaArray = [];
-            var nx = pixels.shape[0];
-            var ny = pixels.shape[1];
+            var nx = pixels[0].length;
+            var ny = pixels.length;
 
             for (var i = 0; i < nx; i++)
             {
                 sepiaRow = [];
                 for (var j = 0; j < ny; j++)
                 {
-                    var rOrig = pixels.get(i, j, 0);
-                    var gOrig = pixels.get(i, j, 1);
-                    var bOrig = pixels.get(i, j, 2);
+                    var rOrig = pixels[i][j][0];
+                    var gOrig = pixels[i][j][1];
+                    var bOrig = pixels[i][j][2];
                     sepiaRow.push(
                     {
                         r: (rOrig * .393) + (gOrig * .769) + (bOrig * .189),
                         g: (rOrig * .349) + (gOrig * .686) + (bOrig * .168),
                         b: (rOrig * .272) + (gOrig * .534) + (bOrig * .131),
-                        a: pixels.get(i, j, 3)
+                        a: pixels[i][j][3]
                     });
                 }
                 sepiaArray.push(sepiaRow);
@@ -57,7 +58,7 @@ function convertToBlackAndWhite(fileName, callback)
 {
     if (fileName)
     {
-        getPixels(fileName, function(err, pixels)
+        getPixels(fileName, function(err, img, pixels)
         {
             if (err)
             {
@@ -65,8 +66,8 @@ function convertToBlackAndWhite(fileName, callback)
             }
 
             var bwArray = [];
-            var nx = pixels.shape[0];
-            var ny = pixels.shape[1];
+            var nx = pixels[0].length;
+            var ny = pixels.length;
 
             for (var i = 0; i < nx; i++)
             {
@@ -75,10 +76,10 @@ function convertToBlackAndWhite(fileName, callback)
                 {
                     bwRow.push(
                     {
-                        r: pixels.get(i, j, 0) * 0.299,
-                        g: pixels.get(i, j, 1) * 0.587,
-                        b: pixels.get(i, j, 2) * 0.114,
-                        a: pixels.get(i, j, 3)
+                        r: pixels[i][j][0] * 0.299,
+                        g: pixels[i][j][1] * 0.587,
+                        b: pixels[i][j][2] * 0.114,
+                        a: pixels[i][j][3]
                     });
                 }
                 bwArray.push(bwRow);
@@ -92,24 +93,40 @@ function convertToBlackAndWhite(fileName, callback)
     }
 }
 
-function convertArrayToBuffer(array)
+/**
+ * Gets the pixels in a 2D array of RGBA values
+ * @param {string} fileName The filename
+ * @param {function} callback The callback function 
+ */
+function getPixels(fileName, callback)
 {
-    console.log(array[0].length);
+    var data = fs.readFileSync('test_images/test-image.png');
+    var png = new PNG();
+    png.parse(data, function(err, img_data)
+    {
+        origArray = new Uint8Array(img_data.data);
+        rgbaArray = []
+        row = []
+        for (i = 0; i < (png.width * png.height * 4); i+=4)
+        {
+            rgba = [origArray[i], origArray[i+1], origArray[i+2], origArray[i+3]]
+            row.push(rgba)
+            if (row.length == png.width)
+            {
+                rgbaArray.push(row)
+                row = []
+            }
+        }
+        callback(null, png, rgbaArray)
+    });
 }
 
 function main()
 {
-    convertToSepia("test_images/test-image.png", function(err, data)
+    convertToBlackAndWhite("test_images/test-image.png", function(err, data)
     {
         if (err) throw err;
-        convertArrayToBuffer(data);
-        //console.log(data);
-    });
-
-    fs.readFile("test_images/test-image.png", function(err, data)
-    {
-        if (err) throw err;
-        console.log(data.length);
+        console.log(data);
     });
 }
 
