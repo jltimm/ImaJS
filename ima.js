@@ -11,7 +11,7 @@ function convertToSepia(fileName, callback)
 {
     if (fileName)
     {
-        getPixels(fileName, function(err, img, pixels)
+        getPixels(fileName, function(err, pixels)
         {
             if (err)
             {
@@ -58,7 +58,7 @@ function convertToBlackAndWhite(fileName, callback)
 {
     if (fileName)
     {
-        getPixels(fileName, function(err, img, pixels)
+        getPixels(fileName, function(err, pixels)
         {
             if (err)
             {
@@ -117,16 +117,48 @@ function getPixels(fileName, callback)
                 row = []
             }
         }
-        callback(null, png, rgbaArray)
+        callback(null, rgbaArray)
     });
+}
+
+/**
+ * Writes an image file to disk
+ * @param {string} fileName The filename 
+ * @param {2d array} data The pixel data 
+ * @param {function} callback The callback 
+ */
+function writeToFile(fileName, data, callback)
+{
+    buffer = []
+    for (i = 0; i < data[0].length; i++)
+    {
+        for (j = 0; j < data.length; j++)
+        {
+            hexR = Math.round(data[i][j].r);
+            buffer.push(hexR);
+            hexG = Math.round(data[i][j].g);
+            buffer.push(hexG)
+            hexB = Math.round(data[i][j].b);
+            buffer.push(hexB)
+            hexA = Math.round(data[i][j].a);
+            buffer.push(hexA)
+        }
+    }
+    var image = new PNG({width: data[0].length, height: data.length});
+    image.data = Buffer.from(buffer);
+    var dataToWrite = PNG.sync.write(image);
+    fs.writeFileSync('out.png', dataToWrite)
 }
 
 function main()
 {
-    convertToBlackAndWhite("test_images/test-image.png", function(err, data)
+    convertToSepia("test_images/test-image.png", function(err, data)
     {
         if (err) throw err;
-        console.log(data);
+        writeToFile("test.png", data, function(err)
+        {
+            if (err) throw err;
+        });
     });
 }
 
