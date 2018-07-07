@@ -27,14 +27,14 @@ function convertToSepia(fileName, callback)
                 sepiaRow = [];
                 for (var j = 0; j < ny; j++)
                 {
-                    var rOrig = pixels[i][j][0];
-                    var gOrig = pixels[i][j][1];
-                    var bOrig = pixels[i][j][2];
+                    var r = (pixels[i][j][0] * .393) + (pixels[i][j][1] * .769) + (pixels[i][j][2] * .189);
+                    var g = (pixels[i][j][0] * .349) + (pixels[i][j][1] * .686) + (pixels[i][j][2] * .168);
+                    var b = (pixels[i][j][0] * .272) + (pixels[i][j][1] * .534) + (pixels[i][j][2] * .131);
                     sepiaRow.push(
                     {
-                        r: (rOrig * .393) + (gOrig * .769) + (bOrig * .189),
-                        g: (rOrig * .349) + (gOrig * .686) + (bOrig * .168),
-                        b: (rOrig * .272) + (gOrig * .534) + (bOrig * .131),
+                        r: (r > 255 ? 255 : r),
+                        g: (g > 255 ? 255 : g),
+                        b: (b > 255 ? 255 : b),
                         a: pixels[i][j][3]
                     });
                 }
@@ -105,16 +105,15 @@ function getPixels(fileName, callback)
     png.parse(data, function(err, img_data)
     {
         origArray = new Uint8Array(img_data.data);
-        rgbaArray = []
-        row = []
+        rgbaArray = [];
+        row = [];
         for (i = 0; i < (png.width * png.height * 4); i+=4)
         {
-            rgba = [origArray[i], origArray[i+1], origArray[i+2], origArray[i+3]]
-            row.push(rgba)
+            row.push([origArray[i], origArray[i+1], origArray[i+2], origArray[i+3]]);
             if (row.length == png.width)
             {
-                rgbaArray.push(row)
-                row = []
+                rgbaArray.push(row);
+                row = [];
             }
         }
         callback(null, rgbaArray)
@@ -127,27 +126,23 @@ function getPixels(fileName, callback)
  * @param {2d array} data The pixel data 
  * @param {function} callback The callback 
  */
-function writeToFile(fileName, data, callback)
+function writeToFile(fileName, newFileName, data, callback)
 {
     buffer = []
     for (i = 0; i < data[0].length; i++)
     {
         for (j = 0; j < data.length; j++)
         {
-            hexR = Math.round(data[i][j].r);
-            buffer.push(hexR);
-            hexG = Math.round(data[i][j].g);
-            buffer.push(hexG)
-            hexB = Math.round(data[i][j].b);
-            buffer.push(hexB)
-            hexA = Math.round(data[i][j].a);
-            buffer.push(hexA)
+            buffer.push(Math.round(data[i][j].r));
+            buffer.push(Math.round(data[i][j].g));
+            buffer.push(Math.round(data[i][j].b));
+            buffer.push(Math.round(data[i][j].a));
         }
     }
     var image = new PNG({width: data[0].length, height: data.length});
     image.data = Buffer.from(buffer);
     var dataToWrite = PNG.sync.write(image);
-    fs.writeFileSync('out.png', dataToWrite)
+    fs.writeFileSync(newFileName, dataToWrite)
 }
 
 function main()
@@ -155,7 +150,7 @@ function main()
     convertToSepia("test_images/test-image.png", function(err, data)
     {
         if (err) throw err;
-        writeToFile("test.png", data, function(err)
+        writeToFile("test.png", "testout.png", data, function(err)
         {
             if (err) throw err;
         });
