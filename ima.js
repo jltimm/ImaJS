@@ -19,15 +19,18 @@ ImaJS.prototype.grayscale = function(filename, callback) {
             var grayscaleArray = [];
             var nx = pixels[0].length;
             var ny = pixels.length;
-            // TODO: 3 two arrays simultaneously: original, grayscale, edge
-            for (var i = 0; i < nx; i++) {
+            for (var i = -1; i < nx + 1; i++) {
                 var grayscaleRow = [];
-                for (var j = 0; j < ny; j++) {
-                    grayscaleRow.push(
-                        pixels[i][j][0] * 0.2126 + 
-                        pixels[i][j][1] * 0.7152 +
-                        pixels[i][j][2] * 0.0722
-                    );
+                for (var j = -1; j < ny + 1; j++) {
+                    if (i == -1 || i == nx || j == -1 || j == ny) {
+                        grayscaleRow.push(0);
+                    } else {
+                        grayscaleRow.push(
+                            pixels[i][j][0] * 0.2126 + 
+                            pixels[i][j][1] * 0.7152 +
+                            pixels[i][j][2] * 0.0722
+                        );
+                    }
                 }
                 grayscaleArray.push(grayscaleRow);
             }
@@ -55,9 +58,9 @@ ImaJS.prototype.sobel = function(image) {
         [-1, -2, -1]
     ];
     var sobelArray = [];
-    for (var x = 1; x < image.length-1; x++) {
+    for (var x = 1; x < image.length - 1; x++) {
         var sobelRow = [];
-        for (var y = 1; y < image[0].length-1; y++) {
+        for (var y = 1; y < image[0].length - 1; y++) {
             var g = calculateGradients(image, x, y, kernelX, kernelY);
             sobelRow.push(g);
         }
@@ -75,6 +78,7 @@ ImaJS.prototype.sobel = function(image) {
  * @param {2d array} kernelY The y kernel
  */
 function calculateGradients(image, x, y, kernelX, kernelY) {
+    // TODO: clean this up: put in for loop
 	var gx = (kernelX[2][2] * image[x-1][y-1]) + (kernelX[2][1] * image[x-1][y]) + (kernelX[2][0] * image[x-1][y+1]) +
              (kernelX[1][2] * image[x][y-1]) + (kernelX[1][1] * image[x][y]) + (kernelX[1][0] * image[x][y+1]) +
              (kernelX[0][2] * image[x+1][y-1]) + (kernelX[0][1] * image[x+1][y]) + (kernelX[0][0] * image[x+1][y+1]);

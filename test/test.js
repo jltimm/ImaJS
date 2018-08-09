@@ -5,6 +5,7 @@ function runTest() {
   	ima.grayscale('./test_images/test-image.png', function(err, pixelArray) {
     	if (err) throw err;
 		var sobel = ima.sobel(pixelArray);
+		console.log(sobel);
     	ima.writeFileSync('testout.png', sobel);
   	});
 }
