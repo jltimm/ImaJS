@@ -70,6 +70,34 @@ ImaJS.prototype.sobel = function(image) {
 }
 
 /**
+ * Applies sobel filter to an image
+ * @param {2d array} data The data
+ * @param {function} callback The callback
+ */
+ImaJS.prototype.prewitt = function(image) {
+    var kernelX = [
+        [-1, 0, 1],
+        [-1, 0, 1],
+		[-1, 0, 1],
+    ];
+    var kernelY = [
+        [-1, -1, -1],
+		[ 0,  0,  0],
+		[ 1,  1,  1],
+    ];
+    var prewittArray = [];
+    for (var x = 1; x < image.length - 1; x++) {
+        var prewittRow = [];
+        for (var y = 1; y < image[0].length - 1; y++) {
+            var g = calculateGradients(image, x, y, kernelX, kernelY);
+            prewittRow.push(g);
+        }
+        prewittArray.push(prewittRow);
+    }
+    return prewittArray;
+}
+
+/**
  * Calculates the gradients according to the kernels.
  * @param {2d array} image The array of pixels
  * @param {int} x The current x position
@@ -136,4 +164,5 @@ function getPixels(fileName, callback) {
 }
 
 // TODO: functionality for JPEG
-// TODO: 
+// TODO: custom kernels
+// TODO: move padding out of grayscale
