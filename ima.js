@@ -70,7 +70,7 @@ ImaJS.prototype.sobel = function(image) {
 }
 
 /**
- * Applies sobel filter to an image
+ * Applies prewitt filter to an image
  * @param {2d array} data The data
  * @param {function} callback The callback
  */
@@ -95,6 +95,34 @@ ImaJS.prototype.prewitt = function(image) {
         prewittArray.push(prewittRow);
     }
     return prewittArray;
+}
+
+/**
+ * Applies Scharr filter to an image
+ * @param {2d array} data The data
+ * @param {function} callback The callback
+ */
+ImaJS.prototype.scharr = function(image) {
+    var kernelX = [
+        [ -3, 0,  3],
+		[-10, 0, 10],
+		[ -3, 0,  3],
+    ];
+    var kernelY = [
+        [-3, -10, -3],
+		[ 0,   0,  0],
+		[ 3,  10,  3],
+    ];
+    var scharrArray = [];
+    for (var x = 1; x < image.length - 1; x++) {
+        var scharrRow = [];
+        for (var y = 1; y < image[0].length - 1; y++) {
+            var g = calculateGradients(image, x, y, kernelX, kernelY);
+            scharrRow.push(g);
+        }
+        scharrArray.push(scharrRow);
+    }
+    return scharrArray;
 }
 
 /**
@@ -166,3 +194,4 @@ function getPixels(fileName, callback) {
 // TODO: functionality for JPEG
 // TODO: custom kernels
 // TODO: move padding out of grayscale
+// TODO: consider moving functions out - passing in the type as an argument
