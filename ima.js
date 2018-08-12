@@ -57,16 +57,7 @@ ImaJS.prototype.sobel = function(image) {
         [ 0,  0,  0],
         [-1, -2, -1]
     ];
-    var sobelArray = [];
-    for (var x = 1; x < image.length - 1; x++) {
-        var sobelRow = [];
-        for (var y = 1; y < image[0].length - 1; y++) {
-            var g = calculateGradients(image, x, y, kernelX, kernelY);
-            sobelRow.push(g);
-        }
-        sobelArray.push(sobelRow);
-    }
-    return sobelArray;
+    return edgeDetection(image, kernelX, kernelY);
 }
 
 /**
@@ -85,16 +76,7 @@ ImaJS.prototype.prewitt = function(image) {
 		[ 0,  0,  0],
 		[ 1,  1,  1],
     ];
-    var prewittArray = [];
-    for (var x = 1; x < image.length - 1; x++) {
-        var prewittRow = [];
-        for (var y = 1; y < image[0].length - 1; y++) {
-            var g = calculateGradients(image, x, y, kernelX, kernelY);
-            prewittRow.push(g);
-        }
-        prewittArray.push(prewittRow);
-    }
-    return prewittArray;
+    return edgeDetection(image, kernelX, kernelY);
 }
 
 /**
@@ -113,16 +95,26 @@ ImaJS.prototype.scharr = function(image) {
 		[ 0,   0,  0],
 		[ 3,  10,  3],
     ];
-    var scharrArray = [];
+    return edgeDetection(image, kernelX, kernelY);
+}
+
+/**
+ * Performs the edge detection on the image
+ * @param {2d array} image The image pixels
+ * @param {2d array} kernelX The X kernel 
+ * @param {2d array} kernelY The Y kernel
+ */
+function edgeDetection(image, kernelX, kernelY) {
+    var edgeArray = [];
     for (var x = 1; x < image.length - 1; x++) {
-        var scharrRow = [];
+        var edgeRow = [];
         for (var y = 1; y < image[0].length - 1; y++) {
             var g = calculateGradients(image, x, y, kernelX, kernelY);
-            scharrRow.push(g);
+            edgeRow.push(g);
         }
-        scharrArray.push(scharrRow);
+        edgeArray.push(edgeRow);
     }
-    return scharrArray;
+    return edgeArray;
 }
 
 /**
@@ -194,4 +186,3 @@ function getPixels(fileName, callback) {
 // TODO: functionality for JPEG
 // TODO: custom kernels
 // TODO: move padding out of grayscale
-// TODO: consider moving functions out - passing in the type as an argument
