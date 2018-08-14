@@ -6,11 +6,81 @@ function ImaJS() { }
 module.exports = ImaJS;
 
 /**
+ * Applies sobel filter to an image
+ * @param {2d array} data The data
+ * @param {function} callback The callback
+ */
+ImaJS.prototype.sobel = function(filename, callback) {
+    var kernelX = [
+        [1, 0, -1],
+        [2, 0, -2],
+        [1, 0, -1]
+    ];
+    var kernelY = [
+        [ 1,  2,  1],
+        [ 0,  0,  0],
+        [-1, -2, -1]
+    ];
+    grayscale(filename, (err, pixelArray) => {
+        if (err) throw err;
+        var edgeImage = edgeDetection(pixelArray, kernelX, kernelY);
+        callback(null, edgeImage);
+    });
+}
+
+/**
+ * Applies prewitt filter to an image
+ * @param {2d array} data The data
+ * @param {function} callback The callback
+ */
+ImaJS.prototype.prewitt = function(filename, callback) {
+    var kernelX = [
+        [-1, 0, 1],
+        [-1, 0, 1],
+		[-1, 0, 1],
+    ];
+    var kernelY = [
+        [-1, -1, -1],
+		[ 0,  0,  0],
+		[ 1,  1,  1],
+    ];
+    grayscale(filename, (err, pixelArray) => {
+        if (err) throw err;
+        var edgeImage = edgeDetection(pixelArray, kernelX, kernelY);
+        callback(null, edgeImage);
+    });
+}
+
+/**
+ * Applies Scharr filter to an image
+ * @param {2d array} data The data
+ * @param {function} callback The callback
+ */
+ImaJS.prototype.scharr = function(filename, callback) {
+    var kernelX = [
+        [ -3, 0,  3],
+		[-10, 0, 10],
+		[ -3, 0,  3],
+    ];
+    var kernelY = [
+        [-3, -10, -3],
+		[ 0,   0,  0],
+		[ 3,  10,  3],
+    ];
+    grayscale(filename, (err, pixelArray) => {
+        if (err) throw err;
+        var edgeImage = edgeDetection(pixelArray, kernelX, kernelY);
+        callback(null, edgeImage);
+    });
+    //return edgeDetection(image, kernelX, kernelY);
+}
+
+/**
  * Converts an image to grayscale
  * @param {string} filename The name of the file to be read
  * @param {function} callback The callback
  */
-ImaJS.prototype.grayscale = function(filename, callback) {
+function grayscale(filename, callback) {
     if (filename) {
         getPixels(filename, function(err, pixels) {
             if (err) {
@@ -39,63 +109,6 @@ ImaJS.prototype.grayscale = function(filename, callback) {
     } else {
         callback(new Error("Filename is null."), null);
     }
-}
-
-/**
- * Applies sobel filter to an image
- * @param {2d array} data The data
- * @param {function} callback The callback
- */
-ImaJS.prototype.sobel = function(image) {
-    var kernelX = [
-        [1, 0, -1],
-        [2, 0, -2],
-        [1, 0, -1]
-    ];
-    var kernelY = [
-        [ 1,  2,  1],
-        [ 0,  0,  0],
-        [-1, -2, -1]
-    ];
-    return edgeDetection(image, kernelX, kernelY);
-}
-
-/**
- * Applies prewitt filter to an image
- * @param {2d array} data The data
- * @param {function} callback The callback
- */
-ImaJS.prototype.prewitt = function(image) {
-    var kernelX = [
-        [-1, 0, 1],
-        [-1, 0, 1],
-		[-1, 0, 1],
-    ];
-    var kernelY = [
-        [-1, -1, -1],
-		[ 0,  0,  0],
-		[ 1,  1,  1],
-    ];
-    return edgeDetection(image, kernelX, kernelY);
-}
-
-/**
- * Applies Scharr filter to an image
- * @param {2d array} data The data
- * @param {function} callback The callback
- */
-ImaJS.prototype.scharr = function(image) {
-    var kernelX = [
-        [ -3, 0,  3],
-		[-10, 0, 10],
-		[ -3, 0,  3],
-    ];
-    var kernelY = [
-        [-3, -10, -3],
-		[ 0,   0,  0],
-		[ 3,  10,  3],
-    ];
-    return edgeDetection(image, kernelX, kernelY);
 }
 
 /**
@@ -186,3 +199,4 @@ function getPixels(fileName, callback) {
 // TODO: functionality for JPEG
 // TODO: custom kernels
 // TODO: move padding out of grayscale
+// TODO: write file async
