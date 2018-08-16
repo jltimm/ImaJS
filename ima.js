@@ -1,5 +1,6 @@
-var fs = require('fs');
-var PNG = require('pngjs').PNG;
+var fs   = require('fs');
+var PNG  = require('pngjs').PNG;
+var jpeg = require('jpeg-js');
 
 function ImaJS() { }
 
@@ -73,6 +74,32 @@ ImaJS.prototype.scharr = function(filename, callback) {
         callback(null, edgeImage);
     });
     //return edgeDetection(image, kernelX, kernelY);
+}
+
+/**
+ * Writes an image file to disk
+ * @param {string} newFilename The filename 
+ * @param {2d array} data The pixel data 
+ * @param {function} callback The callback 
+ */
+ImaJS.prototype.writeFile = function(newFilename, data, callback) {
+    var buffer = []
+    for (i = 0; i < data[0].length; i++) {
+        for (j = 0; j < data.length; j++) {
+            buffer.push(Math.round(data[i][j]));
+        }
+    }
+    var image = new PNG({width: data[0].length, height: data.length});
+    image.data = buffer;
+    var dataToWrite = PNG.sync.write(image, {inputColorType: 0});
+    if (callback) {
+        fs.writeFile(newFilename, dataToWrite, (err) => {
+            if (err) throw err;
+            callback(null);
+        });
+    } else {
+        fs.writeFileSync(newFilename, dataToWrite);
+    }
 }
 
 /**
@@ -154,56 +181,45 @@ function calculateGradients(image, x, y, kernelX, kernelY) {
 }
 
 /**
- * Writes an image file to disk
- * @param {string} newFilename The filename 
- * @param {2d array} data The pixel data 
- * @param {function} callback The callback 
+ * Returns the extension of the file.
+ * @param {string} filename 
  */
-ImaJS.prototype.writeFile = function(newFilename, data, callback) {
-    var buffer = []
-    for (i = 0; i < data[0].length; i++) {
-        for (j = 0; j < data.length; j++) {
-            buffer.push(Math.round(data[i][j]));
-        }
-    }
-    var image = new PNG({width: data[0].length, height: data.length});
-    image.data = buffer;
-    var dataToWrite = PNG.sync.write(image, {inputColorType: 0});
-    if (callback) {
-        fs.writeFile(newFilename, dataToWrite, (err) => {
-            if (err) throw err;
-            callback(null);
-        });
-    } else {
-        fs.writeFileSync(newFilename, dataToWrite);
-    }
+function getFileExtension(filename) {
+    return filename.toLowerCase().split('.').pop();
 }
 
 /**
  * Gets the pixels in a 2D array of RGBA values
- * @param {string} fileName The filename
+ * @param {string} filename The filename
  * @param {function} callback The callback function 
  */
-function getPixels(fileName, callback) {
-    var data = fs.readFileSync(fileName);
-    var png = new PNG();
-    png.parse(data, function(err, img_data) {
-        if (err) throw err;
-        origArray = new Uint8Array(img_data.data);
-        rgbaArray = [];
-        row = [];
-        for (i = 0; i < (png.width * png.height * 4); i+=4) {
-            row.push([origArray[i], origArray[i+1], origArray[i+2], origArray[i+3]]);
-            if (row.length == png.width) {
-                rgbaArray.push(row);
-                row = [];
+function getPixels(filename, callback) {
+    // TODO: switch to async
+    var data = fs.readFileSync(filename);
+    var extension = getFileExtension(filename);
+    if (extension === 'png') {
+        var png = new PNG();
+        png.parse(data, function(err, img_data) {
+            if (err) throw err;
+            origArray = new Uint8Array(img_data.data);
+            rgbaArray = [];
+            row = [];
+            for (i = 0; i < (png.width * png.height * 4); i+=4) {
+                row.push([origArray[i], origArray[i+1], origArray[i+2], origArray[i+3]]);
+                if (row.length == png.width) {
+                    rgbaArray.push(row);
+                    row = [];
+                }
             }
-        }
-        callback(null, rgbaArray)
-    });
+            callback(null, rgbaArray)
+        });
+    } else if (extension === 'jpg' || extension === 'jpeg') {
+        console.log('JPEG');
+    } else {
+        callback(new Error('ImaJS does not support this image format.'));
+    }
 }
 
 // TODO: functionality for JPEG
 // TODO: custom kernels
 // TODO: move padding out of grayscale
-// TODO: write file async
