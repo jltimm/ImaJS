@@ -155,11 +155,11 @@ function calculateGradients(image, x, y, kernelX, kernelY) {
 
 /**
  * Writes an image file to disk
- * @param {string} newFileame The filename 
+ * @param {string} newFilename The filename 
  * @param {2d array} data The pixel data 
  * @param {function} callback The callback 
  */
-ImaJS.prototype.writeFileSync = function(newFilename, data) {
+ImaJS.prototype.writeFile = function(newFilename, data, callback) {
     var buffer = []
     for (i = 0; i < data[0].length; i++) {
         for (j = 0; j < data.length; j++) {
@@ -169,7 +169,14 @@ ImaJS.prototype.writeFileSync = function(newFilename, data) {
     var image = new PNG({width: data[0].length, height: data.length});
     image.data = buffer;
     var dataToWrite = PNG.sync.write(image, {inputColorType: 0});
-    fs.writeFileSync(newFilename, dataToWrite)
+    if (callback) {
+        fs.writeFile(newFilename, dataToWrite, (err) => {
+            if (err) throw err;
+            callback(null);
+        });
+    } else {
+        fs.writeFileSync(newFilename, dataToWrite);
+    }
 }
 
 /**
