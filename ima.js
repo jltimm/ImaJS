@@ -214,7 +214,17 @@ function getPixels(filename, callback) {
             callback(null, rgbaArray)
         });
     } else if (extension === 'jpg' || extension === 'jpeg') {
-        console.log('JPEG');
+        var jpg = jpeg.decode(data, true);
+        var rgbaArray = [];
+        var row = [];
+        for (i = 0; i < (jpg.width * jpg.height * 4); i += 4) {
+            row.push([jpg.data[i], jpg.data[i+1], jpg.data[i+2], jpg.data[i+3]]);
+            if (row.length == jpg.width) {
+                rgbaArray.push(row);
+                row = [];
+            }
+        }
+        callback(null, rgbaArray);
     } else {
         callback(new Error('ImaJS does not support this image format.'));
     }
