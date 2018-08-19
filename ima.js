@@ -84,8 +84,8 @@ ImaJS.prototype.scharr = function(filename, callback) {
  */
 ImaJS.prototype.writeFile = function(newFilename, data, callback) {
     var buffer = []
-    for (i = 0; i < data[0].length; i++) {
-        for (j = 0; j < data.length; j++) {
+    for (i = 0; i < data.length; i++) {
+        for (j = 0; j < data[0].length; j++) {
             buffer.push(Math.round(data[i][j]));
         }
     }
@@ -116,10 +116,10 @@ function grayscale(filename, callback) {
             var grayscaleArray = [];
             var nx = pixels[0].length;
             var ny = pixels.length;
-            for (var i = -1; i < nx + 1; i++) {
+            for (var i = -1; i < ny + 1; i++) {
                 var grayscaleRow = [];
-                for (var j = -1; j < ny + 1; j++) {
-                    if (i == -1 || i == nx || j == -1 || j == ny) {
+                for (var j = -1; j < nx + 1; j++) {
+                    if (i == -1 || i == ny || j == -1 || j == nx) {
                         grayscaleRow.push(0);
                     } else {
                         grayscaleRow.push(
@@ -215,8 +215,8 @@ function getPixels(filename, callback) {
         });
     } else if (extension === 'jpg' || extension === 'jpeg') {
         var jpg = jpeg.decode(data, true);
-        var rgbaArray = [];
-        var row = [];
+        rgbaArray = [];
+        row = [];
         for (i = 0; i < (jpg.width * jpg.height * 4); i += 4) {
             row.push([jpg.data[i], jpg.data[i+1], jpg.data[i+2], jpg.data[i+3]]);
             if (row.length == jpg.width) {
