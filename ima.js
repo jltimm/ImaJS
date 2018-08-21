@@ -202,34 +202,31 @@ function getPixels(filename, callback) {
         png.parse(data, function(err, img_data) {
             if (err) throw err;
             origArray = new Uint8Array(img_data.data);
-            rgbaArray = [];
-            row = [];
-            for (i = 0; i < (png.width * png.height * 4); i+=4) {
-                row.push([origArray[i], origArray[i+1], origArray[i+2], origArray[i+3]]);
-                if (row.length == png.width) {
-                    rgbaArray.push(row);
-                    row = [];
-                }
-            }
+            rgbaArray = getRGBAArray(origArray, png.width, png.height);
             callback(null, rgbaArray)
         });
     } else if (extension === 'jpg' || extension === 'jpeg') {
         var jpg = jpeg.decode(data, true);
-        rgbaArray = [];
-        row = [];
-        for (i = 0; i < (jpg.width * jpg.height * 4); i += 4) {
-            row.push([jpg.data[i], jpg.data[i+1], jpg.data[i+2], jpg.data[i+3]]);
-            if (row.length == jpg.width) {
-                rgbaArray.push(row);
-                row = [];
-            }
-        }
+        rgbaArray = getRGBAArray(jpg.data, jpg.width, jpg.height);
         callback(null, rgbaArray);
     } else {
         callback(new Error('ImaJS does not support this image format.'));
     }
 }
 
-// TODO: functionality for JPEG
+function getRGBAArray(image, width, height) {
+    var rgbaArray = [];
+    var row = [];
+    for (i = 0; i < (width * height * 4); i += 4) {
+        row.push([image[i], image[i+1], image[i+2], image[i+3]]);
+        if (row.length == width) {
+            rgbaArray.push(row);
+            row = [];
+        }
+    }
+    return rgbaArray;
+}
+
 // TODO: custom kernels
 // TODO: move padding out of grayscale
+// TODO: GIF support
