@@ -214,6 +214,12 @@ function getPixels(filename, callback) {
     }
 }
 
+/**
+ * Returns 2D RGBA array from uint8 array of pixels
+ * @param {array} image The array of pixels
+ * @param {int} width The width of the image
+ * @param {int} height The height of the image
+ */
 function getRGBAArray(image, width, height) {
     var rgbaArray = [];
     var row = [];
