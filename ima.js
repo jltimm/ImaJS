@@ -166,17 +166,17 @@ function edgeDetection(image, kernelX, kernelY) {
  * @param {2d array} kernelY The y kernel
  */
 function calculateGradients(image, x, y, kernelX, kernelY) {
-    var gx1 = 0.0;
-    var gy1 = 0.0;
+    var gx = 0.0;
+    var gy = 0.0;
     for (var a = 0; a < kernelX.length; a++) {
         for (var b = 0; b < kernelY.length; b++) {
             var xn = x + a - 1;
             var yn = y + b - 1;
-            gx1 += (kernelX[a][b] * image[xn][yn]);
-            gy1 += (kernelY[a][b] * image[xn][yn]);
+            gx += (kernelX[a][b] * image[xn][yn]);
+            gy += (kernelY[a][b] * image[xn][yn]);
         }
     }
-    var g = Math.round(Math.sqrt((gx1 * gx1) + (gy1 * gy1)));
+    var g = Math.round(Math.sqrt((gx * gx) + (gy * gy)));
     if (g > 255) {
         return 255;
     }
