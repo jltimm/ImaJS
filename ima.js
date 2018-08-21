@@ -166,14 +166,17 @@ function edgeDetection(image, kernelX, kernelY) {
  * @param {2d array} kernelY The y kernel
  */
 function calculateGradients(image, x, y, kernelX, kernelY) {
-    // TODO: clean this up: put in for loop
-	var gx = (kernelX[2][2] * image[x-1][y-1]) + (kernelX[2][1] * image[x-1][y]) + (kernelX[2][0] * image[x-1][y+1]) +
-             (kernelX[1][2] * image[x][y-1]) + (kernelX[1][1] * image[x][y]) + (kernelX[1][0] * image[x][y+1]) +
-             (kernelX[0][2] * image[x+1][y-1]) + (kernelX[0][1] * image[x+1][y]) + (kernelX[0][0] * image[x+1][y+1]);
-    var gy = (kernelY[2][2] * image[x-1][y-1]) + (kernelY[2][1] * image[x-1][y]) + (kernelY[2][0] * image[x-1][y+1]) +
-             (kernelY[1][2] * image[x][y-1]) + (kernelY[1][1] * image[x][y]) + (kernelY[1][0] * image[x][y+1]) +
-             (kernelY[0][2] * image[x+1][y-1]) + (kernelY[0][1] * image[x+1][y]) + (kernelY[0][0] * image[x+1][y+1]);
-    var g = Math.round(Math.sqrt((gx * gx) + (gy * gy)));
+    var gx1 = 0.0;
+    var gy1 = 0.0;
+    for (var a = 0; a < kernelX.length; a++) {
+        for (var b = 0; b < kernelY.length; b++) {
+            var xn = x + a - 1;
+            var yn = y + b - 1;
+            gx1 += (kernelX[a][b] * image[xn][yn]);
+            gy1 += (kernelY[a][b] * image[xn][yn]);
+        }
+    }
+    var g = Math.round(Math.sqrt((gx1 * gx1) + (gy1 * gy1)));
     if (g > 255) {
         return 255;
     }
