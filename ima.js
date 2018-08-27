@@ -76,6 +76,10 @@ ImaJS.prototype.scharr = function(filename, callback) {
     //return edgeDetection(image, kernelX, kernelY);
 }
 
+ImaJS.prototype.custom = function(filename, kernelX, kernelY, callback) {
+    // TODO
+}
+
 /**
  * Writes an image file to disk
  * @param {string} newFilename The filename 
@@ -89,16 +93,34 @@ ImaJS.prototype.writeFile = function(newFilename, data, callback) {
             buffer.push(Math.round(data[i][j]));
         }
     }
-    var image = new PNG({width: data[0].length, height: data.length});
-    image.data = buffer;
-    var dataToWrite = PNG.sync.write(image, {inputColorType: 0});
-    if (callback) {
-        fs.writeFile(newFilename, dataToWrite, (err) => {
-            if (err) throw err;
-            callback(null);
-        });
-    } else {
-        fs.writeFileSync(newFilename, dataToWrite);
+    var extension = getFileExtension(newFilename);
+    if (extension === 'png') {
+        var image = new PNG({width: data[0].length, height: data.length});
+        image.data = buffer;
+        var dataToWrite = PNG.sync.write(image, {inputColorType: 0});
+        if (callback) {
+            fs.writeFile(newFilename, dataToWrite, (err) => {
+                if (err) throw err;
+                callback(null);
+            });
+        } else {
+            fs.writeFileSync(newFilename, dataToWrite);
+        }
+    } else if (extension === 'jpg' || extension === 'jpeg') {
+        var rawImageData = {
+            data: buffer,
+            width: data.length,
+            height: data[0].length
+        };
+        var jpegImageData = jpeg.encode(rawImageData, 100);
+        if (callback) {
+            fs.writeFile(newFilename, jpegImageData.data, (err) => {
+                if (err) throw err;
+                callback(null);
+            });
+        } else {
+            fs.writeFileSync(newFilename, jpegImageData);
+        }
     }
 }
 
@@ -239,3 +261,4 @@ function getRGBAArray(image, width, height) {
 // TODO: custom kernels
 // TODO: move padding out of grayscale
 // TODO: GIF support
+// TODO: TIFF support
