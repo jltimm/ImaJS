@@ -88,12 +88,23 @@ ImaJS.prototype.custom = function(filename, kernelX, kernelY, callback) {
  */
 ImaJS.prototype.writeFile = function(newFilename, data, callback) {
     var buffer = []
+    var extension = getFileExtension(newFilename);
+    var isJpeg = (extension === 'jpeg' || extension === 'jpg'); 
     for (i = 0; i < data.length; i++) {
         for (j = 0; j < data[0].length; j++) {
             buffer.push(Math.round(data[i][j]));
+            // pad buffer with 3 extra pixels to accomodate for JPEG
+            if (isJpeg) {
+                for (k = 0; k <= 2; k++) {
+                    if (k === 2) {
+                        buffer.push(255);
+                    } else {
+                        buffer.push(Math.round(data[i][j]));
+                    }
+                }
+            }
         }
     }
-    var extension = getFileExtension(newFilename);
     if (extension === 'png') {
         var image = new PNG({width: data[0].length, height: data.length});
         image.data = buffer;
@@ -106,11 +117,11 @@ ImaJS.prototype.writeFile = function(newFilename, data, callback) {
         } else {
             fs.writeFileSync(newFilename, dataToWrite);
         }
-    } else if (extension === 'jpg' || extension === 'jpeg') {
+    } else if (isJpeg) {
         var rawImageData = {
             data: buffer,
-            width: data.length,
-            height: data[0].length
+            width: data[0].length,
+            height: data.length
         };
         var jpegImageData = jpeg.encode(rawImageData, 100);
         if (callback) {
