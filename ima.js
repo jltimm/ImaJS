@@ -8,7 +8,7 @@ module.exports = ImaJS;
 
 /**
  * Applies sobel filter to an image
- * @param {2d array} data The data
+ * @param {string} filename The filename
  * @param {function} callback The callback
  */
 ImaJS.prototype.sobel = function(filename, callback) {
@@ -31,7 +31,7 @@ ImaJS.prototype.sobel = function(filename, callback) {
 
 /**
  * Applies prewitt filter to an image
- * @param {2d array} data The data
+ * @param {string} filename The filename
  * @param {function} callback The callback
  */
 ImaJS.prototype.prewitt = function(filename, callback) {
@@ -54,7 +54,7 @@ ImaJS.prototype.prewitt = function(filename, callback) {
 
 /**
  * Applies Scharr filter to an image
- * @param {2d array} data The data
+ * @param {string} filename The filename
  * @param {function} callback The callback
  */
 ImaJS.prototype.scharr = function(filename, callback) {
@@ -73,11 +73,24 @@ ImaJS.prototype.scharr = function(filename, callback) {
         var edgeImage = edgeDetection(pixelArray, kernelX, kernelY);
         callback(null, edgeImage);
     });
-    //return edgeDetection(image, kernelX, kernelY);
 }
 
+/**
+ * Applies a custom filter to an image
+ * @param {string} filename The filename 
+ * @param {2d array} kernelX The X kernel 
+ * @param {2d array} kernelY The Y kernel
+ * @param {function} callback The callback
+ */
 ImaJS.prototype.custom = function(filename, kernelX, kernelY, callback) {
-    // TODO
+    if (kernelX.length === kernelX[0].length
+     && kernelY.length === kernelY[0].length
+     && kernelX.length === kernelY[0].length) {
+         grayscale(filename, (err, pixelArray) => {
+             var edgeImage = edgeDetection(pixelArray, kernelX, kernelY);
+             callback(null, edgeImage);
+         })
+     }
 }
 
 /**
