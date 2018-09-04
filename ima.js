@@ -155,7 +155,7 @@ ImaJS.prototype.writeFile = function(newFilename, data, callback) {
  */
 function grayscale(filename, callback) {
     if (filename) {
-        getPixels(filename, function(err, pixels) {
+        getPixels(filename, (err, pixels) => {
             if (err) {
                 callback(new Error("Error occurred while getting pixels", null));
             }
@@ -243,24 +243,26 @@ function getFileExtension(filename) {
  * @param {function} callback The callback function 
  */
 function getPixels(filename, callback) {
-    // TODO: switch to async
-    var data = fs.readFileSync(filename);
-    var extension = getFileExtension(filename);
-    if (extension === 'png') {
-        var png = new PNG();
-        png.parse(data, function(err, img_data) {
-            if (err) throw err;
-            origArray = new Uint8Array(img_data.data);
-            rgbaArray = getRGBAArray(origArray, png.width, png.height);
-            callback(null, rgbaArray)
-        });
-    } else if (extension === 'jpg' || extension === 'jpeg') {
-        var jpg = jpeg.decode(data, true);
-        rgbaArray = getRGBAArray(jpg.data, jpg.width, jpg.height);
-        callback(null, rgbaArray);
-    } else {
-        callback(new Error('ImaJS does not support this image format.'));
-    }
+    fs.readFile(filename, (err, data) =>
+    {
+        if (err) throw err;
+        var extension = getFileExtension(filename);
+        if (extension === 'png') {
+            var png = new PNG();
+            png.parse(data, (err, img_data) => {
+                if (err) throw err;
+                origArray = new Uint8Array(img_data.data);
+                rgbaArray = getRGBAArray(origArray, png.width, png.height);
+                callback(null, rgbaArray)
+            });
+        } else if (extension === 'jpg' || extension === 'jpeg') {
+            var jpg = jpeg.decode(data, true);
+            rgbaArray = getRGBAArray(jpg.data, jpg.width, jpg.height);
+            callback(null, rgbaArray);
+        } else {
+            callback(new Error('ImaJS does not support this image format.'));
+        }
+    });
 }
 
 /**
@@ -282,7 +284,6 @@ function getRGBAArray(image, width, height) {
     return rgbaArray;
 }
 
-// TODO: custom kernels
 // TODO: move padding out of grayscale
 // TODO: GIF support
 // TODO: TIFF support
