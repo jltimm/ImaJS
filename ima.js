@@ -76,6 +76,27 @@ ImaJS.prototype.scharr = function(filename, callback) {
 }
 
 /**
+ * Applies roberts cross to an image
+ * @param {string} filename The filename
+ * @param {function} callback The callback
+ */
+ImaJS.prototype.roberts = function(filename, callback) {
+    var kernelX = [
+        [1,  0],
+        [0, -1]
+    ];
+    var kernelY = [
+        [ 0, 1],
+        [-1, 0]
+    ];
+    grayscale(filename, (err, pixelArray) => {
+        if (err) throw err;
+        var edgeImage = edgeDetection(pixelArray, kernelX, kernelY);
+        callback(null, edgeImage);
+    })
+}
+
+/**
  * Applies a custom filter to an image
  * @param {string} filename The filename 
  * @param {2d array} kernelX The X kernel 
@@ -87,6 +108,7 @@ ImaJS.prototype.custom = function(filename, kernelX, kernelY, callback) {
      && kernelY.length === kernelY[0].length
      && kernelX.length === kernelY[0].length) {
          grayscale(filename, (err, pixelArray) => {
+             if (err) throw err;
              var edgeImage = edgeDetection(pixelArray, kernelX, kernelY);
              callback(null, edgeImage);
          })
@@ -162,18 +184,14 @@ function grayscale(filename, callback) {
             var grayscaleArray = [];
             var nx = pixels[0].length;
             var ny = pixels.length;
-            for (var i = -1; i < ny + 1; i++) {
+            for (var i = 0; i < ny; i++) {
                 var grayscaleRow = [];
-                for (var j = -1; j < nx + 1; j++) {
-                    if (i == -1 || i == ny || j == -1 || j == nx) {
-                        grayscaleRow.push(0);
-                    } else {
-                        grayscaleRow.push(
-                            pixels[i][j][0] * 0.2126 + 
-                            pixels[i][j][1] * 0.7152 +
-                            pixels[i][j][2] * 0.0722
-                        );
-                    }
+                for (var j = 0; j < nx; j++) {
+                    grayscaleRow.push(
+                        pixels[i][j][0] * 0.2126 + 
+                        pixels[i][j][1] * 0.7152 +
+                        pixels[i][j][2] * 0.0722
+                    );
                 }
                 grayscaleArray.push(grayscaleRow);
             }
@@ -287,3 +305,4 @@ function getRGBAArray(image, width, height) {
 // TODO: move padding out of grayscale
 // TODO: GIF support
 // TODO: TIFF support
+// TODO: get rid of duplicate code
