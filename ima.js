@@ -197,6 +197,13 @@ function grayscale(filename, callback) {
     }
 }
 
+/**
+ * 
+ * @param {string} filename The filename
+ * @param {2D array} kernelX The X kernel
+ * @param {2D array} kernelY The Y kernel
+ * @param {function} callback The callback function
+ */
 function getEdgeImage(filename, kernelX, kernelY, callback) {
     grayscale(filename, (err, pixelArray) => {
         if (err) throw err;
