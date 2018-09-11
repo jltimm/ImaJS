@@ -102,7 +102,8 @@ ImaJS.prototype.roberts = function(filename, callback) {
 ImaJS.prototype.custom = function(filename, kernelX, kernelY, callback) {
     if (kernelX.length === kernelX[0].length
      && kernelY.length === kernelY[0].length
-     && kernelX.length === kernelY[0].length) {
+     && kernelX.length === kernelY[0].length
+     && kernelX.length !== 3) {
         getEdgeImage(filename, kernelX, kernelY, (err, edgeImage) => {
             if (err) throw err;
             callback(null, edgeImage);
@@ -312,6 +313,6 @@ function getRGBAArray(image, width, height) {
     return rgbaArray;
 }
 
-// TODO: move padding out of grayscale
+// TODO: figure out way to not make image smaller
 // TODO: GIF support
 // TODO: TIFF support
