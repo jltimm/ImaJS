@@ -22,9 +22,8 @@ ImaJS.prototype.sobel = function(filename, callback) {
         [ 0,  0,  0],
         [-1, -2, -1]
     ];
-    grayscale(filename, (err, pixelArray) => {
+    getEdgeImage(filename, kernelX, kernelY, (err, edgeImage) => {
         if (err) throw err;
-        var edgeImage = edgeDetection(pixelArray, kernelX, kernelY);
         callback(null, edgeImage);
     });
 }
@@ -45,9 +44,8 @@ ImaJS.prototype.prewitt = function(filename, callback) {
 		[ 0,  0,  0],
 		[ 1,  1,  1],
     ];
-    grayscale(filename, (err, pixelArray) => {
+    getEdgeImage(filename, kernelX, kernelY, (err, edgeImage) => {
         if (err) throw err;
-        var edgeImage = edgeDetection(pixelArray, kernelX, kernelY);
         callback(null, edgeImage);
     });
 }
@@ -68,9 +66,8 @@ ImaJS.prototype.scharr = function(filename, callback) {
 		[ 0,   0,  0],
 		[ 3,  10,  3],
     ];
-    grayscale(filename, (err, pixelArray) => {
+    getEdgeImage(filename, kernelX, kernelY, (err, edgeImage) => {
         if (err) throw err;
-        var edgeImage = edgeDetection(pixelArray, kernelX, kernelY);
         callback(null, edgeImage);
     });
 }
@@ -89,11 +86,10 @@ ImaJS.prototype.roberts = function(filename, callback) {
         [ 0, 1],
         [-1, 0]
     ];
-    grayscale(filename, (err, pixelArray) => {
+    getEdgeImage(filename, kernelX, kernelY, (err, edgeImage) => {
         if (err) throw err;
-        var edgeImage = edgeDetection(pixelArray, kernelX, kernelY);
         callback(null, edgeImage);
-    })
+    });
 }
 
 /**
@@ -107,11 +103,10 @@ ImaJS.prototype.custom = function(filename, kernelX, kernelY, callback) {
     if (kernelX.length === kernelX[0].length
      && kernelY.length === kernelY[0].length
      && kernelX.length === kernelY[0].length) {
-         grayscale(filename, (err, pixelArray) => {
-             if (err) throw err;
-             var edgeImage = edgeDetection(pixelArray, kernelX, kernelY);
-             callback(null, edgeImage);
-         })
+        getEdgeImage(filename, kernelX, kernelY, (err, edgeImage) => {
+            if (err) throw err;
+            callback(null, edgeImage);
+        });
      }
 }
 
@@ -200,6 +195,14 @@ function grayscale(filename, callback) {
     } else {
         callback(new Error("Filename is null."), null);
     }
+}
+
+function getEdgeImage(filename, kernelX, kernelY, callback) {
+    grayscale(filename, (err, pixelArray) => {
+        if (err) throw err;
+        var edgeImage = edgeDetection(pixelArray, kernelX, kernelY);
+        callback(null, edgeImage);
+    });
 }
 
 /**
@@ -305,4 +308,3 @@ function getRGBAArray(image, width, height) {
 // TODO: move padding out of grayscale
 // TODO: GIF support
 // TODO: TIFF support
-// TODO: get rid of duplicate code
