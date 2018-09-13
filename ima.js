@@ -220,16 +220,14 @@ function getEdgeImage(filename, kernelX, kernelY, callback) {
  * @param {2d array} kernelY The Y kernel
  */
 function edgeDetection(image, kernelX, kernelY) {
-    var edgeArray = [];
-    for (var x = 1; x < image.length - 1; x++) {
-        var edgeRow = [];
-        for (var y = 1; y < image[0].length - 1; y++) {
+    var copiedImage = JSON.parse(JSON.stringify(image));
+    for (var x = 1; x < copiedImage.length - 1; x++) {
+        for (var y = 1; y < copiedImage[0].length - 1; y++) {
             var g = calculateGradients(image, x, y, kernelX, kernelY);
-            edgeRow.push(g);
+            copiedImage[x][y] = g;
         }
-        edgeArray.push(edgeRow);
     }
-    return edgeArray;
+    return copiedImage;
 }
 
 /**
