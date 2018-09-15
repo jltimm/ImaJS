@@ -108,6 +108,9 @@ ImaJS.prototype.custom = function(filename, kernelX, kernelY, callback) {
             if (err) throw err;
             callback(null, edgeImage);
         });
+     } else {
+         // TODO: make these more clear.
+        callback(new Error("There are problems with your input kernels. Kernels must be 3x3."), null);
      }
 }
 
@@ -199,6 +202,7 @@ function grayscale(filename, callback) {
 }
 
 /**
+ * Gets grayscale of an image, then calls edge detection function.
  * 
  * @param {string} filename The filename
  * @param {2D array} kernelX The X kernel
@@ -270,8 +274,7 @@ function getFileExtension(filename) {
  * @param {function} callback The callback function 
  */
 function getPixels(filename, callback) {
-    fs.readFile(filename, (err, data) =>
-    {
+    fs.readFile(filename, (err, data) => {
         if (err) throw err;
         var extension = getFileExtension(filename);
         if (extension === 'png') {
@@ -311,6 +314,5 @@ function getRGBAArray(image, width, height) {
     return rgbaArray;
 }
 
-// TODO: figure out way to not make image smaller
 // TODO: GIF support
 // TODO: TIFF support
