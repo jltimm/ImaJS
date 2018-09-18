@@ -1,6 +1,7 @@
 var fs   = require('fs');
 var PNG  = require('pngjs').PNG;
 var jpeg = require('jpeg-js');
+var bmp = require('bmp-js');
 
 function ImaJS() { }
 
@@ -110,7 +111,7 @@ ImaJS.prototype.custom = function(filename, kernelX, kernelY, callback) {
         });
      } else {
          // TODO: make these more clear.
-        callback(new Error("There are problems with your input kernels. Kernels must be 3x3."), null);
+        callback(new Error('There are problems with your input kernels. Kernels must be 3x3.'), null);
      }
 }
 
@@ -178,7 +179,7 @@ function grayscale(filename, callback) {
     if (filename) {
         getPixels(filename, (err, pixels) => {
             if (err) {
-                callback(new Error("Error occurred while getting pixels", null));
+                callback(new Error('Error occurred while getting pixels', null));
             }
             var grayscaleArray = [];
             var nx = pixels[0].length;
@@ -197,7 +198,7 @@ function grayscale(filename, callback) {
             callback(null, grayscaleArray);
         });
     } else {
-        callback(new Error("Filename is null."), null);
+        callback(new Error('Filename is null.'), null);
     }
 }
 
@@ -281,14 +282,18 @@ function getPixels(filename, callback) {
             var png = new PNG();
             png.parse(data, (err, img_data) => {
                 if (err) throw err;
-                origArray = new Uint8Array(img_data.data);
-                rgbaArray = getRGBAArray(origArray, png.width, png.height);
+                console.log(img_data.data);
+                var origArray = new Uint8Array(img_data.data);
+                var rgbaArray = getRGBAArray(origArray, png.width, png.height);
                 callback(null, rgbaArray)
             });
         } else if (extension === 'jpg' || extension === 'jpeg') {
             var jpg = jpeg.decode(data, true);
-            rgbaArray = getRGBAArray(jpg.data, jpg.width, jpg.height);
+            var rgbaArray = getRGBAArray(jpg.data, jpg.width, jpg.height);
             callback(null, rgbaArray);
+        } else if (extension === 'bmp') {
+            var bmpData = bmp.decode(data);
+            var origArray = new Uint8Array(bmpData.data);
         } else {
             callback(new Error('ImaJS does not support this image format.'));
         }
