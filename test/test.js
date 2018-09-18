@@ -4,9 +4,9 @@ function runTest() {
 	var ima = new ImaJS();
 	ima.sobel('./test_images/test-image3.bmp', (err, pixelArray) => {
 		if (err) throw err;
-		// ima.writeFile('testout.png', pixelArray, (err) => {
-		// 	if (err) throw err;
-		// });
+		ima.writeFile('testout.png', pixelArray, (err) => {
+			if (err) throw err;
+		});
 	});
 }
 

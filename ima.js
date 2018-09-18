@@ -282,7 +282,6 @@ function getPixels(filename, callback) {
             var png = new PNG();
             png.parse(data, (err, img_data) => {
                 if (err) throw err;
-                console.log(img_data.data);
                 var origArray = new Uint8Array(img_data.data);
                 var rgbaArray = getRGBAArray(origArray, png.width, png.height);
                 callback(null, rgbaArray)
@@ -294,6 +293,8 @@ function getPixels(filename, callback) {
         } else if (extension === 'bmp') {
             var bmpData = bmp.decode(data);
             var origArray = new Uint8Array(bmpData.data);
+            var rgbaArray = getRGBAArray(origArray, bmpData.width, bmpData.height);
+            callback(null, rgbaArray);
         } else {
             callback(new Error('ImaJS does not support this image format.'));
         }
