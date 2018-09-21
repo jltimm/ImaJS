@@ -124,14 +124,15 @@ ImaJS.prototype.custom = function(filename, kernelX, kernelY, callback) {
 ImaJS.prototype.writeFile = function(newFilename, data, callback) {
     var buffer = []
     var extension = getFileExtension(newFilename);
-    var isJpeg = (extension === 'jpeg' || extension === 'jpg'); 
+    var isJpeg = (extension === 'jpeg' || extension === 'jpg');
+    var isBmp = (extension === 'bmp');
     for (i = 0; i < data.length; i++) {
         for (j = 0; j < data[0].length; j++) {
             buffer.push(Math.round(data[i][j]));
             // pad buffer with 3 extra pixels to accomodate for JPEG
-            if (isJpeg) {
+            if (isJpeg || isBmp) {
                 for (k = 0; k <= 2; k++) {
-                    if (k === 2) {
+                    if (k === 2 && !isBmp) {
                         buffer.push(255);
                     } else {
                         buffer.push(Math.round(data[i][j]));
@@ -165,7 +166,22 @@ ImaJS.prototype.writeFile = function(newFilename, data, callback) {
                 callback(null);
             });
         } else {
-            fs.writeFileSync(newFilename, jpegImageData);
+            fs.writeFileSync(newFilename, jpegImageData.data);
+        }
+    } else if (isBmp) {
+        var rawImageData = {
+            data: buffer,
+            width: data[0].length,
+            height: data.length
+        };
+        var rawData = bmp.encode(rawImageData);
+        if (callback) {
+            fs.writeFile(newFilename, rawData.data, (err) => {
+                if (err) throw err;
+                callback(null);
+            })
+        } else {
+            fs.writeFileSync(newFilename, rawData.data);
         }
     }
 }
