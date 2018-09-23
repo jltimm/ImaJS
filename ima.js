@@ -122,25 +122,10 @@ ImaJS.prototype.custom = function(filename, kernelX, kernelY, callback) {
  * @param {function} callback The callback 
  */
 ImaJS.prototype.writeFile = function(newFilename, data, callback) {
-    var buffer = []
     var extension = getFileExtension(newFilename);
     var isJpeg = (extension === 'jpeg' || extension === 'jpg');
     var isBmp = (extension === 'bmp');
-    for (i = 0; i < data.length; i++) {
-        for (j = 0; j < data[0].length; j++) {
-            buffer.push(Math.round(data[i][j]));
-            // pad buffer with 3 extra pixels to accomodate for JPEG
-            if (isJpeg || isBmp) {
-                for (k = 0; k <= 2; k++) {
-                    if (k === 2 && !isBmp) {
-                        buffer.push(255);
-                    } else {
-                        buffer.push(Math.round(data[i][j]));
-                    }
-                }
-            }
-        }
-    }
+    var buffer = getBuffer(data, isJpeg, isBmp);
     if (extension === 'png') {
         var image = new PNG({width: data[0].length, height: data.length});
         image.data = buffer;
@@ -184,6 +169,32 @@ ImaJS.prototype.writeFile = function(newFilename, data, callback) {
             fs.writeFileSync(newFilename, rawData.data);
         }
     }
+}
+
+/**
+ * 
+ * @param {2d array} data The pixel data
+ * @param {boolean} isJpeg True if writing to jpeg
+ * @param {boolean} isBmp True if writing to bmp
+ */
+function getBuffer(data, isJpeg, isBmp) {
+    var buffer = [];
+    for (i = 0; i < data.length; i++) {
+        for (j = 0; j < data[0].length; j++) {
+            buffer.push(Math.round(data[i][j]));
+            // pad buffer with 3 extra pixels to accomodate for JPEG
+            if (isJpeg || isBmp) {
+                for (k = 0; k <= 2; k++) {
+                    if (k === 2 && !isBmp) {
+                        buffer.push(255);
+                    } else {
+                        buffer.push(Math.round(data[i][j]));
+                    }
+                }
+            }
+        }
+    }
+    return buffer;
 }
 
 /**
